@@ -640,3 +640,85 @@ func TestConcurrentOperations(t *testing.T) {
 		}
 	}
 }
+<<<<<<< HEAD
+=======
+
+// Performance benchmark (not a test, but useful)
+func BenchmarkInsert(b *testing.B) {
+	trie := NewTrie[int]()
+
+	for i := 0; b.Loop(); i++ {
+		word := fmt.Sprintf("word_%d", i)
+		trie.Insert(&word, i)
+	}
+}
+
+func BenchmarkGet(b *testing.B) {
+	trie := NewTrie[int]()
+
+	// Pre-populate with some data
+	for i := range 1000 {
+		word := fmt.Sprintf("word_%d", i)
+		trie.Insert(&word, i)
+	}
+
+	for i := 0; b.Loop(); i++ {
+		word := fmt.Sprintf("word_%d", i%1000)
+		trie.Get(&word)
+	}
+}
+
+// Benchmark checking existence of a prefix
+func BenchmarkPrefixSearch(b *testing.B) {
+	trie := NewTrie[int]()
+
+	// Pre-populate with some data
+	for i := range 1000 {
+		word := fmt.Sprintf("prefix_%d", i)
+		trie.Insert(&word, i)
+	}
+
+	prefix := "prefix_"
+
+	for b.Loop() {
+		trie.PrefixSearch(&prefix)
+	}
+}
+
+// Benchmark with shorter prefix (more results)
+func BenchmarkAutoCompleteShort(b *testing.B) {
+	trie := NewTrie[int]()
+
+	for i := range 1000 {
+		word := fmt.Sprintf("test_%d", i)
+		trie.Insert(&word, i)
+	}
+
+	prefix := "test_"
+
+	for b.Loop() {
+		trie.AutoComplete(&prefix)
+	}
+}
+
+// Benchmark with longer prefix (fewer results)
+func BenchmarkAutoCompleteLong(b *testing.B) {
+	trie := NewTrie[int]()
+
+	for i := range 1000 {
+		word := fmt.Sprintf("automobile_%d", i)
+		trie.Insert(&word, i)
+	}
+
+	prefix := "automobile_12"
+
+	for b.Loop() {
+		trie.AutoComplete(&prefix)
+	}
+}
+
+// Helper function
+func stringPtr(s string) *string {
+	return &s
+}
+>>>>>>> fb8a450 (I have Implemented all of the base methods and structure for the rust Trie.)
