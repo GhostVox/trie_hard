@@ -25,8 +25,14 @@ Trie hard is a library of tries implemented in different programming languages. 
 
 ## Methods supported consistently though all languages
 - `insert(word: str) -> None`: Inserts a word into the trie.
-- `search(word: str) -> bool`: Searches for a word in the trie.
+- `get(word: str) -> bool`: Searches for a word in the trie.
 - `delete(word: str) -> bool`: Deletes a word from the trie.
 - `prefix_search(prefix: str) -> List[str]`: Searches for words with a given prefix.
 - `autocomplete(prefix: str) -> List[str]`: Autocompletes a word with a given prefix using either dfs or bfs to find all possible completions.
 - `suggest(word: str) -> List[str]`: Suggests words that are similar to the given word.
+## Contributions Welcomed
+To have the contributions pullled into the repo please make sure to follow the guidelines below
+- Make sure your code is well documented and follows the style guide of the language you are contributing to.
+- Make sure your code is tested and passes all tests.
+- Make sure your code is efficient and does not have any memory leaks.
+- If you are writting the library for a new language, please make sure to implement all the unviersal methods, you are more then welcome to add additional functionality to your library.
