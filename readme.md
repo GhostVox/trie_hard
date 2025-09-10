@@ -13,7 +13,7 @@ Trie hard is a library of tries implemented in different programming languages. 
 - Kotlin
 - C
 - Nim ?
-- c#
+- C#
 - Ruby
 - php
 - bash
