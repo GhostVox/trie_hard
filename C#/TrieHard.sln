@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrieHard", "TrieHard\TrieHard.csproj", "{DA102245-0B5E-4171-A27A-4F34238C8435}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DA102245-0B5E-4171-A27A-4F34238C8435}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA102245-0B5E-4171-A27A-4F34238C8435}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA102245-0B5E-4171-A27A-4F34238C8435}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA102245-0B5E-4171-A27A-4F34238C8435}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
