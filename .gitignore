@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 **/.vscode/
+=======
+**/.vscode/*
+>>>>>>> bd0c6c3 (remove cpp from rust folder)
