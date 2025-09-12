@@ -1,8 +1,7 @@
-#include "TrieNode.h"
+#include "TrieNode.hpp"
 #include <memory>
 #include <optional>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 template <typename T>

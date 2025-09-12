@@ -1,13 +1,12 @@
 #include <memory>
 #include <optional>
-#include <string>
 #include <unordered_map>
 
 template <typename T>
 class TrieNode {
   public:
-    TrieNode();
-    ~TrieNode();
+    TrieNode() = default;
+    ~TrieNode() = default;
     bool hasChildren();
     std::optional<std::unique_ptr<TrieNode<T>>> getChild(char);
     std::unique_ptr<TrieNode<T>> addChild(char);
@@ -23,12 +22,6 @@ class TrieNode {
     std::unordered_map<char, std::unique_ptr<TrieNode<T>>> children;
     std::optional<T> value;
 };
-
-template <typename T>
-TrieNode<T>::TrieNode() = default;
-
-template <typename T>
-TrieNode<T>::~TrieNode() = default;
 
 template <typename T>
 bool TrieNode<T>::hasChildren() {
@@ -75,5 +68,5 @@ std::optional<T> TrieNode<T>::clearValue() {
 
 template <typename T>
 void TrieNode<T>::setValue(T value) {
-    this.value = value;
+    this->value = value;
 }
