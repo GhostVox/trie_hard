@@ -1,0 +1,31 @@
+goos: darwin
+goarch: arm64
+pkg: github.com/Ghostvox/trie_hard/tree/main/go
+cpu: Apple M3 Pro
+BenchmarkInsert-11               	 3975550	       311.2 ns/op
+BenchmarkInsert-11               	 4258609	       310.9 ns/op
+BenchmarkInsert-11               	 4055056	       308.6 ns/op
+BenchmarkInsert-11               	 4106503	       313.1 ns/op
+BenchmarkInsert-11               	 4159506	       315.7 ns/op
+BenchmarkGet-11                  	11600390	       104.3 ns/op
+BenchmarkGet-11                  	11513473	       104.4 ns/op
+BenchmarkGet-11                  	11447026	       104.1 ns/op
+BenchmarkGet-11                  	11478882	       104.8 ns/op
+BenchmarkGet-11                  	11639876	       104.1 ns/op
+BenchmarkPrefixSearch-11         	46582494	        25.85 ns/op
+BenchmarkPrefixSearch-11         	46846635	        25.83 ns/op
+BenchmarkPrefixSearch-11         	46022488	        25.84 ns/op
+BenchmarkPrefixSearch-11         	47078746	        25.76 ns/op
+BenchmarkPrefixSearch-11         	46725255	        25.79 ns/op
+BenchmarkAutoCompleteShort-11    	   35635	     33713 ns/op
+BenchmarkAutoCompleteShort-11    	   35706	     33730 ns/op
+BenchmarkAutoCompleteShort-11    	   35565	     33820 ns/op
+BenchmarkAutoCompleteShort-11    	   35640	     33689 ns/op
+BenchmarkAutoCompleteShort-11    	   35193	     33779 ns/op
+BenchmarkAutoCompleteLong-11     	 2236558	       533.9 ns/op
+BenchmarkAutoCompleteLong-11     	 2254356	       531.8 ns/op
+BenchmarkAutoCompleteLong-11     	 2257868	       531.0 ns/op
+BenchmarkAutoCompleteLong-11     	 2273079	       526.3 ns/op
+BenchmarkAutoCompleteLong-11     	 2252878	       533.1 ns/op
+PASS
+ok  	github.com/Ghostvox/trie_hard/tree/main/go	30.712s
