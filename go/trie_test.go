@@ -3,6 +3,7 @@ package trie
 import (
 	"fmt"
 	"reflect"
+	"slices"
 	"sort"
 	"testing"
 )
@@ -267,7 +268,36 @@ func TestDeletePruning(t *testing.T) {
 }
 
 // Prefix search tests
-func TestPrefixSearch(t *testing.T) {
+func TestPrefixSearchBoolean(t *testing.T) {
+	trie := NewTrie[string]()
+
+	words := []string{"cat", "cats", "car", "card"}
+	for _, word := range words {
+		trie.Insert(&word, word+"_value")
+	}
+
+	testCases := []struct {
+		prefix   string
+		expected bool
+	}{
+		{"ca", true},     // prefix exists
+		{"car", true},    // prefix exists (also a word)
+		{"cats", true},   // complete word
+		{"xyz", false},   // non-existent prefix
+		{"cards", false}, // longer than any word
+		{"", true},       // empty prefix should exist
+	}
+
+	for _, tc := range testCases {
+		result := trie.PrefixSearch(&tc.prefix)
+		if result != tc.expected {
+			t.Errorf("PrefixSearch(%s): expected %v, got %v", tc.prefix, tc.expected, result)
+		}
+	}
+}
+
+// auto complete tests
+func TestAutoComplete(t *testing.T) {
 	trie := NewTrie[string]()
 
 	words := []string{"cat", "cats", "car", "card", "care", "careful", "dog", "doggy"}
@@ -289,7 +319,7 @@ func TestPrefixSearch(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		results := trie.PrefixSearch(&tc.prefix)
+		results := trie.AutoComplete(&tc.prefix)
 
 		// Sort both slices for comparison
 		sort.Strings(results)
@@ -301,18 +331,18 @@ func TestPrefixSearch(t *testing.T) {
 	}
 }
 
-func TestPrefixSearchEmpty(t *testing.T) {
+func TestAutoCompleteEmpty(t *testing.T) {
 	trie := NewTrie[string]()
 
 	prefix := "anything"
-	results := trie.PrefixSearch(&prefix)
+	results := trie.AutoComplete(&prefix)
 
 	if len(results) != 0 {
 		t.Errorf("Empty trie should return empty results, got %v", results)
 	}
 }
 
-func TestPrefixSearchEmptyPrefix(t *testing.T) {
+func TestAutoCompleteEmptyPrefix(t *testing.T) {
 	trie := NewTrie[string]()
 
 	words := []string{"cat", "dog", "bird"}
@@ -321,7 +351,7 @@ func TestPrefixSearchEmptyPrefix(t *testing.T) {
 	}
 
 	prefix := ""
-	results := trie.PrefixSearch(&prefix)
+	results := trie.AutoComplete(&prefix)
 
 	// Empty prefix should return all words
 	sort.Strings(results)
@@ -332,7 +362,7 @@ func TestPrefixSearchEmptyPrefix(t *testing.T) {
 	}
 }
 
-func TestPrefixSearchWithPrefixAsWord(t *testing.T) {
+func TestAutoCompleteWithPrefixAsWord(t *testing.T) {
 	trie := NewTrie[int]()
 
 	// Insert words where some are prefixes of others
@@ -342,7 +372,7 @@ func TestPrefixSearchWithPrefixAsWord(t *testing.T) {
 	trie.Insert(stringPtr("careless"), 4)
 
 	prefix := "care"
-	results := trie.PrefixSearch(&prefix)
+	results := trie.AutoComplete(&prefix)
 	expected := []string{"care", "careful", "careless"}
 
 	sort.Strings(results)
@@ -404,7 +434,7 @@ func TestAddWordListWithSameValue(t *testing.T) {
 }
 
 // Unicode and special character tests
-func TestUnicodeSupportTrie(t *testing.T) {
+func TestTrieUnicodeSupport(t *testing.T) {
 	trie := NewTrie[string]()
 
 	unicodeWords := map[string]string{
@@ -436,13 +466,13 @@ func TestUnicodeSupportTrie(t *testing.T) {
 		}
 	}
 
-	// Test prefix search with unicode
+	// Test auto complete with unicode
 	prefix := "caf"
-	results := trie.PrefixSearch(&prefix)
+	results := trie.AutoComplete(&prefix)
 	expected := []string{"café"}
 
 	if !reflect.DeepEqual(results, expected) {
-		t.Errorf("Unicode prefix search: expected %v, got %v", expected, results)
+		t.Errorf("Unicode auto complete: expected %v, got %v", expected, results)
 	}
 }
 
@@ -519,22 +549,16 @@ func TestEmptyStringHandling(t *testing.T) {
 		t.Error("Empty string should have correct value")
 	}
 
-	// Test prefix search with empty string
-	results := trie.PrefixSearch(&emptyKey)
+	// Test autoComplete  with empty string
+	results := trie.AutoComplete(&emptyKey)
 	if len(results) == 0 {
-		t.Error("Prefix search with empty string should return something if trie has words")
+		t.Error("AutoComplete  with empty string should return something if trie has words")
 	}
 
 	// Should include the empty string itself if it exists
-	found := false
-	for _, result := range results {
-		if result == "" {
-			found = true
-			break
-		}
-	}
+	found := slices.Contains(results, "")
 	if !found {
-		t.Error("Prefix search should include empty string if it exists as a word")
+		t.Error("auto complete should include empty string if it exists as a word")
 	}
 }
 
@@ -544,7 +568,7 @@ func TestLargeDataset(t *testing.T) {
 	// Generate a large number of words
 	const numWords = 1000
 	words := make([]string, numWords)
-	for i := 0; i < numWords; i++ {
+	for i := range numWords {
 		words[i] = fmt.Sprintf("word_%d", i)
 		trie.Insert(&words[i], i)
 	}
@@ -562,9 +586,9 @@ func TestLargeDataset(t *testing.T) {
 		}
 	}
 
-	// Test prefix search on large dataset
+	// Test auto complete on large dataset
 	prefix := "word_1"
-	results := trie.PrefixSearch(&prefix)
+	results := trie.AutoComplete(&prefix)
 
 	// Should find words like "word_1", "word_10", "word_11", ..., "word_199"
 	if len(results) == 0 {
@@ -575,6 +599,28 @@ func TestLargeDataset(t *testing.T) {
 	for _, result := range results {
 		if len(result) < len(prefix) || result[:len(prefix)] != prefix {
 			t.Errorf("Result %s should start with prefix %s", result, prefix)
+		}
+	}
+}
+
+func TestPrefixSearchEmptyTrie(t *testing.T) {
+	trie := NewTrie[string]()
+
+	// Test various prefixes on empty trie
+	prefixes := []string{"", "a", "test", "anything"}
+
+	for _, prefix := range prefixes {
+		exists := trie.PrefixSearch(&prefix)
+		if prefix == "" {
+			// Empty prefix should exist even in empty trie (root exists)
+			if !exists {
+				t.Errorf("Empty prefix should exist in empty trie")
+			}
+		} else {
+			// Non-empty prefixes should not exist in empty trie
+			if exists {
+				t.Errorf("Prefix %s should not exist in empty trie", prefix)
+			}
 		}
 	}
 }
@@ -602,8 +648,7 @@ func TestConcurrentOperations(t *testing.T) {
 func BenchmarkInsert(b *testing.B) {
 	trie := NewTrie[int]()
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for i := 0; b.Loop(); i++ {
 		word := fmt.Sprintf("word_%d", i)
 		trie.Insert(&word, i)
 	}
@@ -613,31 +658,63 @@ func BenchmarkGet(b *testing.B) {
 	trie := NewTrie[int]()
 
 	// Pre-populate with some data
-	for i := 0; i < 1000; i++ {
+	for i := range 1000 {
 		word := fmt.Sprintf("word_%d", i)
 		trie.Insert(&word, i)
 	}
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for i := 0; b.Loop(); i++ {
 		word := fmt.Sprintf("word_%d", i%1000)
 		trie.Get(&word)
 	}
 }
 
+// Benchmark checking existence of a prefix
 func BenchmarkPrefixSearch(b *testing.B) {
 	trie := NewTrie[int]()
 
 	// Pre-populate with some data
-	for i := 0; i < 1000; i++ {
+	for i := range 1000 {
 		word := fmt.Sprintf("prefix_%d", i)
 		trie.Insert(&word, i)
 	}
 
 	prefix := "prefix_"
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+
+	for b.Loop() {
 		trie.PrefixSearch(&prefix)
+	}
+}
+
+// Benchmark with shorter prefix (more results)
+func BenchmarkAutoCompleteShort(b *testing.B) {
+	trie := NewTrie[int]()
+
+	for i := range 1000 {
+		word := fmt.Sprintf("test_%d", i)
+		trie.Insert(&word, i)
+	}
+
+	prefix := "test_"
+
+	for b.Loop() {
+		trie.AutoComplete(&prefix)
+	}
+}
+
+// Benchmark with longer prefix (fewer results)
+func BenchmarkAutoCompleteLong(b *testing.B) {
+	trie := NewTrie[int]()
+
+	for i := range 1000 {
+		word := fmt.Sprintf("automobile_%d", i)
+		trie.Insert(&word, i)
+	}
+
+	prefix := "automobile_12"
+
+	for b.Loop() {
+		trie.AutoComplete(&prefix)
 	}
 }
 
