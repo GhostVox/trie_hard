@@ -105,6 +105,18 @@ func (self *Trie[TValue]) deleteRecursive(currentNode *TrieNode[TValue], key str
 	}
 }
 
+func (self *Trie[TValue]) PrefixSearch(prefix *string) bool {
+	currentNode := self.root // Use local variable!
+	for _, char := range *prefix {
+		if child, err := currentNode.getChildMut(char); err == 0 {
+			currentNode = child // Modify local variable, not self.root
+		} else {
+			return false
+		}
+	}
+	return true // If we got here, prefix exists
+}
+
 // Preforms a prefix serach on the trie and returns all words that start with the given prefix.
 // If no words match the prefix, an empty list is returned.
 //
@@ -113,8 +125,8 @@ func (self *Trie[TValue]) deleteRecursive(currentNode *TrieNode[TValue], key str
 //	trie := NewTrie()
 //	trie.Insert("apple", 1)
 //	trie.Insert("app", 2)
-//	words := trie.PrefixSearch("app") // words == ["app", "apple"]
-func (self *Trie[TValue]) PrefixSearch(prefix *string) []string {
+//	words := trie.AutoComplete("app") // words == ["app", "apple"]
+func (self *Trie[TValue]) AutoComplete(prefix *string) []string {
 	results := []string{}
 	currentNode := self.root
 	for _, char := range *prefix {
