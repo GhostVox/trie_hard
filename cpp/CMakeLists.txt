@@ -11,8 +11,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # This is crucial for Neovim's LSP (clangd) to work correctly
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Find all your .cpp files in the src directory
-file(GLOB SOURCES "src/*.cpp")
+# Find all your .hpp files in the src directory
+file(GLOB SOURCES "*.hpp" "*.cpp")
 
 # Tell CMake where to find header files
 include_directories(include)
