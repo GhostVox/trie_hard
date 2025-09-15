@@ -1,0 +1,31 @@
+goos: linux
+goarch: amd64
+pkg: github.com/Ghostvox/trie_hard/tree/main/go
+cpu: 11th Gen Intel(R) Core(TM) i7-1195G7 @ 2.90GHz
+BenchmarkInsert-8              	 2539118	       510.8 ns/op
+BenchmarkInsert-8              	 2663516	       468.4 ns/op
+BenchmarkInsert-8              	 2597649	       550.0 ns/op
+BenchmarkInsert-8              	 2556292	       499.0 ns/op
+BenchmarkInsert-8              	 2601480	       526.7 ns/op
+BenchmarkGet-8                 	 7391642	       150.3 ns/op
+BenchmarkGet-8                 	 8220468	       147.5 ns/op
+BenchmarkGet-8                 	 8191192	       168.9 ns/op
+BenchmarkGet-8                 	 6753872	       171.3 ns/op
+BenchmarkGet-8                 	 8036829	       153.6 ns/op
+BenchmarkPrefixSearch-8        	24018032	        42.18 ns/op
+BenchmarkPrefixSearch-8        	28651695	        42.52 ns/op
+BenchmarkPrefixSearch-8        	28649809	        42.50 ns/op
+BenchmarkPrefixSearch-8        	30462385	        42.71 ns/op
+BenchmarkPrefixSearch-8        	29575714	        44.73 ns/op
+BenchmarkAutoCompleteShort-8   	   21846	     55222 ns/op
+BenchmarkAutoCompleteShort-8   	   22294	     55681 ns/op
+BenchmarkAutoCompleteShort-8   	   21910	     55889 ns/op
+BenchmarkAutoCompleteShort-8   	   22136	     54075 ns/op
+BenchmarkAutoCompleteShort-8   	   21327	     55312 ns/op
+BenchmarkAutoCompleteLong-8    	 1348732	       892.4 ns/op
+BenchmarkAutoCompleteLong-8    	 1339519	       901.9 ns/op
+BenchmarkAutoCompleteLong-8    	 1325658	       898.9 ns/op
+BenchmarkAutoCompleteLong-8    	 1351242	       901.7 ns/op
+BenchmarkAutoCompleteLong-8    	 1242686	       950.8 ns/op
+PASS
+ok  	github.com/Ghostvox/trie_hard/tree/main/go	30.964s

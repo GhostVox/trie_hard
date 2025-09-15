@@ -100,7 +100,9 @@ jobs:
           fail-on-alert: false # Don't fail CI, just alert
 
       - name: Upload benchmark artifacts
+
         uses: actions/upload-artifact@v4
+
         with:
           name: benchmark-results
           path: |
