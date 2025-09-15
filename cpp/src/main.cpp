@@ -8,11 +8,13 @@ int main() {
     trie.insert("dog", 3);
 
     auto v = trie.get("car");
-    if (v) std::cout << "car = " << *v << "\n";
+    if (v)
+        std::cout << "car = " << *v << "\n";
 
     auto ac = trie.autocomplete("ca");
     std::cout << "Autocomplete ca -> ";
-    for (auto &x : ac) std::cout << x << ' ';
+    for (auto &x : ac)
+        std::cout << x << ' ';
     std::cout << "\n";
     return 0;
 }

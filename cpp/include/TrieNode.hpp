@@ -14,14 +14,12 @@ class TrieNode {
 
     bool hasChildren() const { return !children.empty(); }
 
-    // Returns existing child pointer or nullptr if absent.
-    TrieNode<T>* getChild(char key) const {
+    TrieNode<T> *getChild(char key) const {
         auto it = children.find(key);
         return it == children.end() ? nullptr : it->second.get();
     }
 
-    // Creates child if absent and returns pointer.
-    TrieNode<T>* addChild(char key) {
+    TrieNode<T> *addChild(char key) {
         auto it = children.find(key);
         if (it == children.end()) {
             it = children.emplace(key, std::make_unique<TrieNode<T>>()).first;
@@ -33,7 +31,7 @@ class TrieNode {
 
     bool isEnd() const { return value.has_value(); }
 
-    const std::optional<T>& getValue() const { return value; }
+    const std::optional<T> &getValue() const { return value; }
 
     std::optional<T> clearValue() {
         auto old = value;
@@ -41,13 +39,12 @@ class TrieNode {
         return old;
     }
 
-    void setValue(const T& v) { value = v; }
+    void setValue(const T &v) { value = v; }
 
     // Expose read-only access to children for traversal (autocomplete, etc.).
-    const std::unordered_map<char, std::unique_ptr<TrieNode<T>>>& getChildren() const { return children; }
+    const std::unordered_map<char, std::unique_ptr<TrieNode<T>>> &getChildren() const { return children; }
 
   private:
     std::unordered_map<char, std::unique_ptr<TrieNode<T>>> children;
     std::optional<T> value;
 };
-
