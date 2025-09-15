@@ -1,7 +1,7 @@
-#TODO(brinhasavlin): fix this whole file. it is not good
-
 # Set the minimum required version of CMake
 cmake_minimum_required(VERSION 3.15)
+
+project(trie_hard CXX)
 
 
 # Set the C++ standard (C++17 is a great choice, or use 20)
