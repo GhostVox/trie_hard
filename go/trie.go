@@ -2,11 +2,13 @@ package trie
 
 import (
 	"errors"
+
 )
 
 type TrieError int
 
 var TrieErrorChildDoesNotExist = errors.New("No child available")
+
 
 type Trie[TValue any] struct {
 	// The root node of the Trie. It does not hold any character itself.
