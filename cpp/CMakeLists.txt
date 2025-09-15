@@ -1,7 +1,6 @@
 # Set the minimum required version of CMake
 cmake_minimum_required(VERSION 3.15)
 
-# Name the project and specify the language
 project(trie_hard CXX)
 
 # Set the C++ standard
