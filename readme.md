@@ -29,7 +29,7 @@ Trie hard is a library of tries implemented in different programming languages. 
 
 where `T` is a generic type
 
-- `insert(word: str) -> None`: Inserts a word into the trie.
+- `insert(word: str) -> None`: Inse xi += int(i) \*\* 2rts a word into the trie.
 - `get(word: str) -> T`: Searches for a word in the trie.
 - `delete(word: str) -> bool`: Deletes a word from the trie.
 - `prefix_search(prefix: str) -> bool`: Searches for words with a given prefix.
