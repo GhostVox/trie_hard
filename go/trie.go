@@ -5,8 +5,6 @@ import (
 
 )
 
-type TrieError int
-
 var TrieErrorChildDoesNotExist = errors.New("No child available")
 
 
