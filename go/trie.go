@@ -1,13 +1,10 @@
 package trie
 
-import (
-	"errors"
-	)
-
 type TrieError int
 
-var (
-	TrieErrorChildDoesNotExist := errors.New("No child available")
+const (
+	TrieErrorChildAlreadyExists TrieError = iota + 1
+	TrieErrorChildDoesNotExist
 )
 
 type Trie[TValue any] struct {
