@@ -2,7 +2,7 @@ package trie
 
 // Represents a node within a Trie. It is generic over the value it stores.
 type TrieNode[TValue any] struct {
-	//Note: The `character` for this node is the *key* in the parent's HashMap.
+	// Note: The `character` for this node is the *key* in the parent's HashMap.
 	// We don't need to store it inside the node itself.
 	children map[rune]*TrieNode[TValue]
 
@@ -33,11 +33,11 @@ func (self *TrieNode[TValue]) containsChild(char rune) bool {
 }
 
 // Gets an reference to a child node correspondiding to the character.
-func (self *TrieNode[TValue]) getChildMut(character rune) (*TrieNode[TValue], TrieError) {
+func (self *TrieNode[TValue]) getChildMut(character rune) (*TrieNode[TValue], error) {
 	if _, exists := self.children[character]; !exists {
 		return nil, TrieErrorChildDoesNotExist
 	}
-	return self.children[character], 0
+	return self.children[character], nil
 }
 
 // Creates a new child node for the given character and returns a reference to that node.

@@ -2,13 +2,11 @@ package trie
 
 import (
 	"errors"
-	)
 
-type TrieError int
-
-var (
-	TrieErrorChildDoesNotExist := errors.New("No child available")
 )
+
+var TrieErrorChildDoesNotExist = errors.New("No child available")
+
 
 type Trie[TValue any] struct {
 	// The root node of the Trie. It does not hold any character itself.
@@ -48,9 +46,8 @@ func (self *Trie[TValue]) Insert(key *string, value TValue) {
 func (self *Trie[TValue]) Get(key *string) (*TValue, bool) {
 	currentNode := self.root
 	for _, char := range *key {
-		if child, err := currentNode.getChildMut(char); err == 0 {
+		if child, err := currentNode.getChildMut(char); err == nil {
 			currentNode = child
-
 		} else {
 			return nil, false
 		}
@@ -94,7 +91,7 @@ func (self *Trie[TValue]) deleteRecursive(currentNode *TrieNode[TValue], key str
 	runes := []rune(key)
 	c := runes[0]
 	remaining := string(runes[1:])
-	if child, hasChildren := currentNode.getChildMut(c); hasChildren == 0 {
+	if child, err := currentNode.getChildMut(c); err == nil {
 		deleted, shouldDeleteChild := self.deleteRecursive(child, remaining)
 		if shouldDeleteChild {
 			currentNode.removeChild(c)
@@ -111,7 +108,7 @@ func (self *Trie[TValue]) deleteRecursive(currentNode *TrieNode[TValue], key str
 func (self *Trie[TValue]) PrefixSearch(prefix *string) bool {
 	currentNode := self.root // Use local variable!
 	for _, char := range *prefix {
-		if child, err := currentNode.getChildMut(char); err == 0 {
+		if child, err := currentNode.getChildMut(char); err == nil {
 			currentNode = child // Modify local variable, not self.root
 		} else {
 			return false
@@ -133,13 +130,12 @@ func (self *Trie[TValue]) AutoComplete(prefix *string) []string {
 	results := []string{}
 	currentNode := self.root
 	for _, char := range *prefix {
-		if child, err := currentNode.getChildMut(char); err == 0 {
+		if child, err := currentNode.getChildMut(char); err == nil {
 			currentNode = child
 		} else {
 			// Prefix not found, return empty list
 			return results
 		}
-
 	}
 
 	self.collectWordsRecursive(currentNode, *prefix, &results)
@@ -159,7 +155,6 @@ func (self *Trie[TValue]) collectWordsRecursive(node *TrieNode[TValue], currPref
 		newPrefix := currPrefix + string(char)
 		self.collectWordsRecursive(child, newPrefix, results)
 	}
-
 }
 
 // Takes a list of words and a function that generates a value for each word to store at the end of
