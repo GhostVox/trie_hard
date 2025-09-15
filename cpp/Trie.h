@@ -1,8 +1,8 @@
-#include "TrieNode.h"
+#pragma once
+#include "TrieNode.hpp"
 #include <memory>
 #include <optional>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 template <typename T>
@@ -13,8 +13,8 @@ class Trie {
     void insert(std::string &, T &);
     std::optional<T> get(std::string &);
     bool remove(std::string);
-    std::vector<T> prefixSearch(std::string);
-    std::vector<T> autocomplete(std::string);
+    bool prefixSearch(std::string);
+    std::vector<T> autocomplete(std::string, int = 50);
     std::vector<T> suggest(std::string);
 
   private:
@@ -49,7 +49,6 @@ std::optional<T> Trie<T>::get(std::string &key) {
     return current->getValue();
 }
 
-// TODO(brinhasavlin): this method is incomplete
 template <typename T>
 bool Trie<T>::remove(std::string key) {
     std::unique_ptr<TrieNode<T>> current = root;
@@ -62,7 +61,6 @@ bool Trie<T>::remove(std::string key) {
         visited.push_back(current);
         current = current->getChild(c);
     }
-    // WARNING(brinhasavlin): not sure if this deletion is correct
     if (current == root) {
         delete root;
         root = nullptr;
@@ -79,4 +77,39 @@ bool Trie<T>::remove(std::string key) {
         last -= 1;
     }
     return true;
+}
+
+template <typename T>
+bool Trie<T>::prefixSearch(std::string key) {
+    std::unique_ptr<TrieNode<T>> current = root;
+    // std::vector<T>
+
+    for (char c : key) {
+        if (!current->getChild(c)) {
+            return false;
+        }
+        current = current->getChild(c);
+    }
+    return true;
+}
+
+template <typename T>
+std::vector<T> Trie<T>::autocomplete(std::string key, int limit) {
+    std::unique_ptr<TrieNode<T>> current = root;
+    std::vector<T> words;
+    for (char c : key) {
+        if (!current->getChild(c)) {
+            return words;
+        }
+        current = current->getChild(c);
+    }
+
+    if (current.isEnd()) {
+        words.push_back(current.getValue());
+    }
+
+    for (TrieNode<T> child : current) {
+    }
+
+    return words;
 }
