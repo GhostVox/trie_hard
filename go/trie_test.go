@@ -8,10 +8,6 @@ import (
 	"testing"
 )
 
-func stringPtr(s string) *string {
-	return &s
-}
-
 // Basic functionality tests
 func TestNewTrie(t *testing.T) {
 	trie := NewTrie[string]()
@@ -640,8 +636,6 @@ func TestConcurrentOperations(t *testing.T) {
 		}
 	}
 }
-<<<<<<< HEAD
-=======
 
 // Performance benchmark (not a test, but useful)
 func BenchmarkInsert(b *testing.B) {
@@ -665,23 +659,6 @@ func BenchmarkGet(b *testing.B) {
 	for i := 0; b.Loop(); i++ {
 		word := fmt.Sprintf("word_%d", i%1000)
 		trie.Get(&word)
-	}
-}
-
-// Benchmark checking existence of a prefix
-func BenchmarkPrefixSearch(b *testing.B) {
-	trie := NewTrie[int]()
-
-	// Pre-populate with some data
-	for i := range 1000 {
-		word := fmt.Sprintf("prefix_%d", i)
-		trie.Insert(&word, i)
-	}
-
-	prefix := "prefix_"
-
-	for b.Loop() {
-		trie.PrefixSearch(&prefix)
 	}
 }
 
@@ -721,4 +698,3 @@ func BenchmarkAutoCompleteLong(b *testing.B) {
 func stringPtr(s string) *string {
 	return &s
 }
->>>>>>> fb8a450 (I have Implemented all of the base methods and structure for the rust Trie.)
