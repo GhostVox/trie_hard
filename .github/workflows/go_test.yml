@@ -1,16 +1,136 @@
 name: Go Test and Security Audit
-
 on:
   pull_request:
+    branches: [main]
+  push:
     branches: [main]
 
 jobs:
   test:
-    name: Test
+    name: Go Test Suite
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
+      - name: Checkout code
+        uses: actions/checkout@v4 # Updated from v2
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
         with:
-          go-version: 1.16
-      - run: go test -v ./...
+          go-version: "1.25.1"
+          check-latest: true
+
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('go/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Verify Go environment
+        working-directory: ./go
+        run: |
+          echo "=== Go Version ==="
+          go version
+          echo "=== Working Directory ==="
+          pwd
+          echo "=== Files in Directory ==="
+          ls -la
+          echo "=== Go Module Content ==="
+          cat go.mod
+
+      - name: Download dependencies
+        working-directory: ./go
+        run: go mod download
+
+      - name: Verify dependencies
+        working-directory: ./go
+        run: go mod verify
+
+      - name: Check code formatting
+        working-directory: ./go
+        run: |
+          if [ "$(gofmt -s -l . | wc -l)" -gt 0 ]; then
+            echo "❌ Code is not formatted. Run 'go fmt ./...' locally"
+            gofmt -s -l .
+            exit 1
+          else
+            echo "✅ Code is properly formatted"
+          fi
+
+      - name: Run go vet
+        working-directory: ./go
+        run: go vet ./...
+
+      - name: Check for syntax errors
+        working-directory: ./go
+        run: |
+          echo "=== Checking for merge conflict markers ==="
+          if grep -rn "<<<\|>>>\|===" *.go; then
+            echo "❌ Found merge conflict markers in code"
+            exit 1
+          else
+            echo "✅ No merge conflict markers found"
+          fi
+
+      - name: Build code
+        working-directory: ./go
+        run: go build -v ./...
+
+      - name: Run tests
+        working-directory: ./go
+        run: go test -v -race -coverprofile=coverage.out ./...
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./go/coverage.out
+          flags: go
+          name: go-coverage
+          fail_ci_if_error: false
+
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.21"
+
+      - name: Run Gosec Security Scanner
+        working-directory: ./go
+        run: |
+          go install github.com/securecodewarrior/gosec/v2/cmd/gosec@latest
+          gosec ./...
+
+      - name: Run govulncheck
+        working-directory: ./go
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          govulncheck ./...
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25.1"
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
+          working-directory: go
+          args: --timeout=5m
