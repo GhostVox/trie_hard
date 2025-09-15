@@ -63,8 +63,9 @@ jobs:
     # Only run benchmarks on main branch or when PR affects performance-critical files
     if: |
       github.ref == 'refs/heads/main' ||
-      contains(github.event.pull_request.head.repo.git_refs_url, 'src/trie.rs') ||
-      contains(github.event.pull_request.head.repo.git_refs_url, 'src/trie_node.rs')
+      contains(github.event.pull_request.changed_files, 'src/trie.rs') ||
+      contains(github.event.pull_request.changed_files, 'src/trie_node.rs') ||
+      contains(github.event.pull_request.changed_files, 'benches/')
 
     steps:
       - name: Checkout code
