@@ -1,5 +1,12 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 **/.vscode/
 =======
 **/.vscode/*
 >>>>>>> bd0c6c3 (remove cpp from rust folder)
+=======
+**/.vscode/*
+=======
+**/.vscode/
+>>>>>>> d171957 (configuring cpp package)
+>>>>>>> 0ca19d7 (configuring cpp package)
