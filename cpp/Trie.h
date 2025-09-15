@@ -1,108 +1,115 @@
+// Trie implementation using unique_ptr only for ownership inside nodes.
 #pragma once
 #include "TrieNode.hpp"
+#include <limits>
 #include <memory>
 #include <optional>
+#include <stack>
 #include <string>
 #include <vector>
 
 template <typename T>
 class Trie {
   public:
-    Trie() = default;
+    Trie() : root(std::make_unique<TrieNode<T>>()) {}
     ~Trie() = default;
-    void insert(std::string &, T &);
-    std::optional<T> get(std::string &);
-    bool remove(std::string);
-    bool prefixSearch(std::string);
-    std::vector<T> autocomplete(std::string, int = 50);
-    std::vector<T> suggest(std::string);
+
+    void insert(const std::string &key, const T &value);
+    std::optional<T> get(const std::string &key) const;
+    bool remove(const std::string &key);
+    bool prefixSearch(const std::string &prefix) const;
+    std::vector<T> autocomplete(const std::string &prefix, int limit = 50) const;
 
   private:
     std::unique_ptr<TrieNode<T>> root;
 };
 
 template <typename T>
-void Trie<T>::insert(std::string &key, T &value) {
-    std::unique_ptr<TrieNode<T>> current = root;
+void Trie<T>::insert(const std::string &key, const T &value) {
+    TrieNode<T> *current = root.get();
     for (char c : key) {
-        if (!current->getChild(c)) {
-            current->addChild(c);
-        }
-        current = current->getChild(c);
+        current = current->addChild(c);
     }
-    if (current->getValue() == value) {
-        return;
+    if (!current->getValue().has_value() || *(current->getValue()) != value) {
+        current->setValue(value);
     }
-    current->setValue(value);
 }
 
 template <typename T>
-std::optional<T> Trie<T>::get(std::string &key) {
-    std::unique_ptr<TrieNode<T>> current = root;
+std::optional<T> Trie<T>::get(const std::string &key) const {
+    const TrieNode<T> *current = root.get();
     for (char c : key) {
-        if (!current->getChild(c)) {
-            return std::nullopt;
-        }
         current = current->getChild(c);
+        if (!current)
+            return std::nullopt;
     }
-
     return current->getValue();
 }
 
 template <typename T>
-bool Trie<T>::remove(std::string key) {
-    std::unique_ptr<TrieNode<T>> current = root;
-    std::vector<std::unique_ptr<TrieNode<T>>> visited;
-
+bool Trie<T>::remove(const std::string &key) {
+    // Track path for potential pruning.
+    std::vector<std::pair<TrieNode<T> *, char>> path;
+    TrieNode<T> *current = root.get();
     for (char c : key) {
-        if (!current->getChild(c)) {
+        TrieNode<T> *next = current->getChild(c);
+        if (!next)
             return false;
-        }
-        visited.push_back(current);
-        current = current->getChild(c);
+        path.emplace_back(current, c);
+        current = next;
     }
-    if (current == root) {
-        delete root;
-        root = nullptr;
-        return true;
-    }
-
-    int last = key.length() - 1;
+    if (!current->isEnd())
+        return false; // key not present
     current->clearValue();
-    while (!visited.empty()) {
-        std::unique_ptr<TrieNode<T>> parent = visited.back();
-        if (!current->hasChildren() && !current->isEnd()) {
-            parent->removeChild(key[last]);
+
+    // prune from leaf upward
+    for (int i = (int)path.size() - 1; i >= 0; --i) {
+        TrieNode<T> *parent = path[i].first;
+        char edge = path[i].second;
+        TrieNode<T> *child = parent->getChild(edge);
+        if (child && !child->hasChildren() && !child->isEnd()) {
+            parent->removeChild(edge);
+        } else {
+            break; // stop when node still needed
         }
-        last -= 1;
     }
     return true;
 }
 
 template <typename T>
-bool Trie<T>::prefixSearch(std::string key) {
-    std::unique_ptr<TrieNode<T>> current = root;
-    // std::vector<T>
-
-    for (char c : key) {
-        if (!current->getChild(c)) {
+bool Trie<T>::prefixSearch(const std::string &prefix) const {
+    const TrieNode<T> *current = root.get();
+    for (char c : prefix) {
+        current = current->getChild(c);
+        if (!current)
             return false;
-        }
-        current = current->getChild(c);
     }
     return true;
 }
 
 template <typename T>
-std::vector<T> Trie<T>::autocomplete(std::string key, int limit) {
-    std::unique_ptr<TrieNode<T>> current = root;
-    std::vector<T> words;
-    for (char c : key) {
-        if (!current->getChild(c)) {
-            return words;
-        }
-        current = current->getChild(c);
+std::vector<T> Trie<T>::autocomplete(const std::string &prefix, int limit) const {
+    if (limit == -1)
+        limit = std::numeric_limits<unsigned int>::max();
+    const TrieNode<T> *start = root.get();
+    for (char c : prefix) {
+        start = start->getChild(c);
+        if (!start)
+            return {};
     }
+    std::vector<T> results;
+    std::stack<const TrieNode<T> *> dfs;
+    dfs.push(start);
+    while (!dfs.empty() && (int)results.size() < limit) {
+        const TrieNode<T> *node = dfs.top();
+        dfs.pop();
+        if (node->isEnd())
+            results.push_back(*(node->getValue()));
+        for (const auto &entry : node->getChildren()) {
+            dfs.push(entry.second.get());
+        }
+    }
+<<<<<<< HEAD:cpp/Trie.h
 
     if (current.isEnd()) {
         words.push_back(current.getValue());
@@ -112,4 +119,7 @@ std::vector<T> Trie<T>::autocomplete(std::string key, int limit) {
     }
 
     return words;
+=======
+    return results;
+>>>>>>> ae01a40 (fix smart pointers):cpp/Trie.hpp
 }
