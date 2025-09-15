@@ -1,6 +1,33 @@
 [package]
-name = "rust-trie-hard"
+name = "trie_hard_rs"
 version = "0.1.0"
 edition = "2024"
+rust-version = "1.85.0"
+license = "MIT OR Apache-2.0"
+authors = ["Brent Harrington <ghostvox@icloud.com>"]
+description = "Fast, memory-efficient Trie (prefix tree) implementation with autocomplete support - Rust implementation"
+readme = "README.md"
+repository = "https://github.com/GhostVox/trie_hard"
+homepage = "https://github.com/GhostVox/trie_hard/tree/main/rust"
+documentation = "https://docs.rs/trie_hard_rs"
+keywords = ["trie", "word-search", "autocomplete", "prefix-tree", "data-structures"]
+categories = ["data-structures", "algorithms", "text-processing"]
 
-[dependencies]
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[[bench]]
+name = "trie_benchmarks"
+harness = false
+
+[package.metadata.criterion]
+measurement_time = 10
+sample_size = 100
+confidence_level = 0.95
+significance_level = 0.05
+
+[profile.bench]
+opt-level = 3
+debug = false
+lto = true
+codegen-units = 1

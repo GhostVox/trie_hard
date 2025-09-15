@@ -41,7 +41,7 @@ impl<TValue> TrieNode<TValue> {
     pub fn add_child(&mut self, character: char) -> &mut TrieNode<TValue> {
         // .or_insert_with() is perfect here. It calls TrieNode::new() only if
         // the `character` key is not already in the HashMap.
-        self.children.entry(character).or_insert_with(TrieNode::new) // Or `|| TrieNode::new()`
+        self.children.entry(character).or_default()
     }
 
     /// Removes a child node.
