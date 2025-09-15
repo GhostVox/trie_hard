@@ -1,6 +1,9 @@
+#pragma once
+#include "Trie.hpp"
 #include <memory>
 #include <optional>
 #include <unordered_map>
+#include <vector>
 
 template <typename T>
 class TrieNode {
@@ -21,6 +24,7 @@ class TrieNode {
   private:
     std::unordered_map<char, std::unique_ptr<TrieNode<T>>> children;
     std::optional<T> value;
+    friend std::vector<T> Trie<T>::autocomplete(std::string, int);
 };
 
 template <typename T>
