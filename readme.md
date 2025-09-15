@@ -10,7 +10,7 @@ Trie hard is a library of tries implemented in different programming languages. 
 - TypeScript
 - Java
 - C++
-- Rust
+- Rust [![Crates.io](https://img.shields.io/crates/v/trie_hard_rs.svg)](https://crates.io/crates/trie_hard_rs) [![Documentation](https://docs.rs/trie_hard_rs/badge.svg)](https://docs.rs/trie_hard_rs) [![CI](https://github.com/GhostVox/trie_hard/workflows/CI/badge.svg)](https://github.com/GhostVox/trie_hard/actions)
 - Go
 - Swift
 - Kotlin
