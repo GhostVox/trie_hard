@@ -1,3 +1,5 @@
+#TODO(brinhasavlin): fix this whole file. it is not good
+
 # Set the minimum required version of CMake
 cmake_minimum_required(VERSION 3.15)
 
