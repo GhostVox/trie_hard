@@ -159,8 +159,7 @@ func TestGetChildMut(t *testing.T) {
 	// Add child and then get it
 	originalChild := node.addChild(char)
 	retrievedChild, err := node.getChildMut(char)
-
-	if err != 0 {
+	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
 	}
 
@@ -224,7 +223,7 @@ func TestMultipleChildren(t *testing.T) {
 		}
 
 		child, err := node.getChildMut(char)
-		if err != 0 {
+		if err != nil {
 			t.Errorf("Failed to get child %c: %v", char, err)
 		}
 		if child == nil {
@@ -271,7 +270,7 @@ func TestUnicodeSupport(t *testing.T) {
 		}
 
 		retrievedChild, err := node.getChildMut(char)
-		if err != 0 {
+		if err != nil {
 			t.Errorf("Failed to get Unicode child %c", char)
 		}
 		if retrievedChild != child {
