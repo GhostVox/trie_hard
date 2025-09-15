@@ -1,5 +1,6 @@
 #pragma once
 #include "TrieNode.hpp"
+#include <iostream>
 #include <memory>
 #include <optional>
 #include <string>
@@ -109,6 +110,7 @@ std::vector<T> Trie<T>::autocomplete(std::string key, int limit) {
     }
 
     for (TrieNode<T> child : current) {
+        std::cout << child;
     }
 
     return words;
