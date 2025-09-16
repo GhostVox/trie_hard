@@ -1,8 +1,6 @@
-name: CI
+name: Rust Test and Security Audit
 
 on:
-  push:
-    branches: [main]
   pull_request:
     branches: [main]
 
@@ -51,42 +49,6 @@ jobs:
 
       - name: Run doc tests
         run: cargo test --doc
-
-  benchmark:
-    name: Performance Benchmarks
-    runs-on: ubuntu-latest
-    needs: test
-    defaults:
-      run:
-        working-directory: ./rust
-    if: |
-      github.ref == 'refs/heads/main' ||
-      contains(github.event.pull_request.changed_files, 'src/trie.rs') ||
-      contains(github.event.pull_request.changed_files, 'src/trie_node.rs') ||
-      contains(github.event.pull_request.changed_files, 'benches/')
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Setup Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-      - name: Cache cargo registry
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-bench-${{ hashFiles('**/Cargo.lock') }}
-      - name: Run benchmarks
-        run: cargo bench
-      - name: Upload benchmark artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: benchmark-results
-          path: target/criterion/
 
   security-audit:
     name: Security Audit
