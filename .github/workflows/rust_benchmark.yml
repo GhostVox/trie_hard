@@ -8,7 +8,6 @@ jobs:
   benchmark:
     name: Performance Benchmarks
     runs-on: ubuntu-latest
-    needs: test
     defaults:
       run:
         working-directory: ./rust

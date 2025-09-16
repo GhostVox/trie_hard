@@ -33,10 +33,10 @@ jobs:
         run: mkdir -p benchmark_results
 
       - name: Make benchmark script executable
-        run: chmod +x benchmark.sh
+        run: chmod +x ./scripts/benchmark.sh
 
       - name: Run Go benchmarks with statistical analysis
-        run: ./benchmark.sh
+        run: ./scripts/benchmark.sh
         env:
           GITHUB_SHA: ${{ github.sha }}
           GITHUB_REF_NAME: ${{ github.ref_name }}
