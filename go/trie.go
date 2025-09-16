@@ -2,15 +2,19 @@ package trie
 
 import (
 	"errors"
-
 )
 
 var TrieErrorChildDoesNotExist = errors.New("No child available")
 
-
 type Trie[TValue any] struct {
 	// The root node of the Trie. It does not hold any character itself.
 	root *TrieNode[TValue]
+}
+
+func NewTrie[TValue any]() *Trie[TValue] {
+	return &Trie[TValue]{
+		root: NewTrieNode[TValue](),
+	}
 }
 
 // Insert adds a key-value pair into the Trie.
