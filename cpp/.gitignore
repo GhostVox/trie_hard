@@ -1,0 +1,7 @@
+<<<<<<< HEAD
+**/build/*
+**/.cache/*
+=======
+**/.cache/*
+**/build/*
+>>>>>>> bd0c6c3 (remove cpp from rust folder)
