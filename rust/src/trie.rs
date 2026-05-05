@@ -66,8 +66,7 @@ impl<TValue: Clone> Trie<TValue> {
                 None => return None,
             }
         }
-        // Return a reference to the value if it exists
-        current_node.get_value()
+        self.nodes[current as usize].get_value()
     }
 
     /// Deletes a key and its associated value from the Trie.
@@ -84,51 +83,43 @@ impl<TValue: Clone> Trie<TValue> {
         if key.is_empty() {
             return false;
         }
-        // We collect the chars to easily pass slices during recursion.
-        let chars: Vec<char> = key.chars().collect();
-        let mut deleted = false;
-        Self::delete_recursively(&mut self.root, &chars, &mut deleted);
-        deleted
-    }
 
-    /// Recursive helper to delete a key. Returns true if the calling node
-    /// should remove the child node from its children map (i.e., prune the branch).
-    fn delete_recursively(
-        current_node: &mut TrieNode<TValue>,
-        key_slice: &[char],
-        deleted: &mut bool,
-    ) -> bool {
-        if key_slice.is_empty() {
-            // We have reached the node corresponding to the key.
-            if current_node.is_end_of_word() {
-                current_node.clear_value();
-                *deleted = true;
-                // Return true if this node has no children, so the parent can remove it.
-                return !current_node.has_children();
+        // Walk down, recording the path as (node_index, char) pairs
+        let mut path: Vec<(u32, char)> = Vec::new();
+        let mut current = 0u32;
+
+        for c in key.chars() {
+            match self.nodes[current as usize].get_child(c) {
+                Some(idx) => {
+                    path.push((current, c));
+                    current = idx;
+                }
+                None => return false, // key doesn't exist
             }
-            // Key doesn't actually exist as a word in the trie.
+        }
+
+        // current is now the terminal node — check it's actually a word
+        if !self.nodes[current as usize].is_end_of_word() {
             return false;
         }
 
-        let c = key_slice[0];
-        let should_delete_child = if let Some(child_node) = current_node.get_child_mut(c) {
-            // Recurse with the rest of the key
-            Self::delete_recursively(child_node, &key_slice[1..], deleted)
-        } else {
-            // The path for the key doesn't exist.
-            return false;
-        };
+        self.nodes[current as usize].clear_value();
 
-        if should_delete_child {
-            current_node.remove_child(c);
-            // After removing the child, if this current node is not the end of another word
-            // and has no other children, it should also be deleted by its parent.
-            return !current_node.is_end_of_word() && !current_node.has_children();
+        // Walk back up pruning nodes that are now dead
+        // (no value, no children)
+        let mut child = current;
+        for (parent, c) in path.into_iter().rev() {
+            if self.nodes[child as usize].has_children()
+                || self.nodes[child as usize].is_end_of_word()
+            {
+                break; // still needed, stop pruning
+            }
+            self.nodes[parent as usize].remove_child(c);
+            child = parent;
         }
 
-        false
+        true
     }
-
     /// Checks if there is any word in the trie that starts with the given prefix.
     /// Returns true if such a prefix exists, false otherwise.
     /// Example:
@@ -139,13 +130,11 @@ impl<TValue: Clone> Trie<TValue> {
     /// assert_eq!(trie.prefix_search("apl"), false);
     /// ```
     pub fn prefix_search(&self, prefix: &str) -> bool {
-        let mut current_node = &self.root;
-
+        let mut current = 0u32;
         for c in prefix.chars() {
-            if let Some(child_node) = current_node.get_child(c) {
-                current_node = child_node;
-            } else {
-                return false;
+            match self.nodes[current as usize].get_child(c) {
+                Some(idx) => current = idx,
+                None => return false,
             }
         }
         true
@@ -167,28 +156,35 @@ impl<TValue: Clone> Trie<TValue> {
         if max_results == 0 {
             return results;
         }
-        let mut current_node = &self.root;
 
+        let mut current = 0u32;
         for c in prefix.chars() {
-            if let Some(child_node) = current_node.get_child(c) {
-                current_node = child_node;
-            } else {
-                return results;
+            match self.nodes[current as usize].get_child(c) {
+                Some(idx) => current = idx,
+                None => return results,
             }
         }
-        if current_node.is_end_of_word() {
+
+        if self.nodes[current as usize].is_end_of_word() {
             results.push(prefix.to_string());
             if results.len() >= max_results {
                 return results;
             }
         }
 
-        Self::collect_words_recursive(current_node, prefix.to_string(), &mut results, max_results);
+        Self::collect_words_recursive(
+            &self.nodes,
+            current,
+            prefix.to_string(),
+            &mut results,
+            max_results,
+        );
         results
     }
 
     fn collect_words_recursive(
-        node: &TrieNode<TValue>,
+        nodes: &[TrieNode<TValue>],
+        current: u32,
         curr_prefix: String,
         results: &mut Vec<String>,
         max_results: usize,
@@ -196,15 +192,15 @@ impl<TValue: Clone> Trie<TValue> {
         if results.len() >= max_results {
             return;
         }
-        for (char, child) in node.children_iter() {
+        for (c, idx) in nodes[current as usize].children_iter() {
             if results.len() >= max_results {
                 return;
             }
-            let new_prefix = format!("{curr_prefix}{char}");
-            if child.is_end_of_word() {
+            let new_prefix = format!("{curr_prefix}{c}");
+            if nodes[idx as usize].is_end_of_word() {
                 results.push(new_prefix.clone());
             }
-            Self::collect_words_recursive(child, new_prefix, results, max_results);
+            Self::collect_words_recursive(nodes, idx, new_prefix, results, max_results);
         }
     }
 
