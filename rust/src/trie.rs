@@ -1,14 +1,26 @@
 use crate::trie_node::TrieNode;
 pub struct Trie<TValue: Clone> {
-    root: TrieNode<TValue>,
+    nodes: Vec<TrieNode<TValue>>,
 }
 
 impl<TValue: Clone> Trie<TValue> {
     /// Initializes a new, empty Trie.
     pub fn new() -> Self {
-        Trie {
-            root: TrieNode::new(),
-        }
+        let mut nodes = Vec::new();
+        nodes.push(TrieNode::new());
+        Self { nodes }
+    }
+
+    pub fn with_capacity(cap: usize) -> Self {
+        let mut nodes = Vec::with_capacity(cap);
+        nodes.push(TrieNode::new());
+        Self { nodes }
+    }
+
+    fn alloc_node(&mut self) -> u32 {
+        let idx = self.nodes.len() as u32;
+        self.nodes.push(TrieNode::new());
+        idx
     }
 
     /// Inserts a key-value pair into the Trie.
@@ -23,11 +35,19 @@ impl<TValue: Clone> Trie<TValue> {
     /// assert_eq!(trie.get("apple"), Some(&1));
     /// ```
     pub fn insert(&mut self, key: &str, value: &TValue) {
-        let mut current_node = &mut self.root;
+        let mut current = 0u32; // root
         for c in key.chars() {
-            current_node = current_node.add_child(c);
+            let next = match self.nodes[current as usize].get_child(c) {
+                Some(idx) => idx,
+                None => {
+                    let idx = self.alloc_node();
+                    self.nodes[current as usize].add_child(c, idx);
+                    idx
+                }
+            };
+            current = next;
         }
-        current_node.set_value(value.clone());
+        self.nodes[current as usize].set_value(value.clone());
     }
 
     /// Searches for a key and returns a reference to its value if it exists.
@@ -39,12 +59,11 @@ impl<TValue: Clone> Trie<TValue> {
     /// assert_eq!(trie.get("apple"), Some(&1));
     /// ```
     pub fn get(&self, key: &str) -> Option<&TValue> {
-        let mut current_node = &self.root;
+        let mut current = 0u32;
         for c in key.chars() {
-            if let Some(node) = current_node.get_child(c) {
-                current_node = node;
-            } else {
-                return None;
+            match self.nodes[current as usize].get_child(c) {
+                Some(idx) => current = idx,
+                None => return None,
             }
         }
         // Return a reference to the value if it exists

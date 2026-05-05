@@ -4,7 +4,7 @@ use std::collections::HashMap;
 pub struct TrieNode<TValue> {
     // Note: The `character` for this node is the *key* in the parent's HashMap.
     // We don't need to store it inside the node itself.
-    children: HashMap<char, TrieNode<TValue>>,
+    pub children: Vec<(char, u32)>,
 
     /// The value associated with the full word ending at this node.
     /// Using Option is key, as intermediate nodes won't have a value.
@@ -16,7 +16,7 @@ impl<TValue> TrieNode<TValue> {
     /// This is the correct constructor for a node that isn't the end of a word yet.
     pub fn new() -> Self {
         Self {
-            children: HashMap::new(),
+            children: Vec::new(),
             value: None,
         }
     }
@@ -27,26 +27,24 @@ impl<TValue> TrieNode<TValue> {
     }
 
     /// Gets an immutable reference to a child node corresponding to the character.
-    pub fn get_child(&self, character: char) -> Option<&TrieNode<TValue>> {
-        self.children.get(&character)
+    pub fn get_child(&self, character: char) -> Option<u32> {
+        self.children
+            .iter()
+            .find(|(c, _)| *c == character)
+            .map(|(_, idx)| *idx)
     }
 
     /// Gets a mutable reference to a child node corresponding to the character.
-    pub fn get_child_mut(&mut self, character: char) -> Option<&mut TrieNode<TValue>> {
-        self.children.get_mut(&character)
-    }
-
-    /// Adds a child node for the given character if it doesn't exist,
-    /// and returns a mutable reference to it.
-    pub fn add_child(&mut self, character: char) -> &mut TrieNode<TValue> {
-        // .or_insert_with() is perfect here. It calls TrieNode::new() only if
-        // the `character` key is not already in the HashMap.
-        self.children.entry(character).or_default()
+    pub fn get_child_mut(&mut self, character: char) -> Option<&mut u32> {
+        self.children
+            .iter_mut()
+            .find(|(c, _)| *c == character)
+            .map(|(_, idx)| idx)
     }
 
     /// Removes a child node.
     pub fn remove_child(&mut self, character: char) {
-        self.children.remove(&character);
+        self.children.retain(|(c, _)| *c != character);
     }
 
     /// Checks if this node represents the end of a complete word.
@@ -59,8 +57,8 @@ impl<TValue> TrieNode<TValue> {
         self.value.as_ref()
     }
 
-    pub fn children_iter(&self) -> impl Iterator<Item = (&char, &TrieNode<TValue>)> {
-        self.children.iter()
+    pub fn children_iter(&self) -> impl Iterator<Item = (char, u32)> + '_ {
+        self.children.iter().map(|(c, idx)| (*c, *idx))
     }
 
     // It's useful for the Trie to be able to set and clear the value.
@@ -75,6 +73,9 @@ impl<TValue> TrieNode<TValue> {
     /// Returns the old value if one existed.
     pub fn clear_value(&mut self) -> Option<TValue> {
         self.value.take()
+    }
+    pub fn add_child(&mut self, character: char, idx: u32) {
+        self.children.push((character, idx));
     }
 }
 
